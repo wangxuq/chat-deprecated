@@ -1,0 +1,22 @@
+{
+  "name": "chat",
+  "version": "0.0.1",
+  "description": "this is a chat",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/wangxuq/chat.git"
+  },
+  "keywords": [
+    "lovelyboy2013."
+  ],
+  "author": "wangxu",
+  "license": "no",
+  "bugs": {
+    "url": "https://github.com/wangxuq/chat/issues"
+  },
+  "homepage": "https://github.com/wangxuq/chat"
+}
