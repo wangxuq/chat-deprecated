@@ -1,0 +1,1 @@
+this is a single chat application based on socket.io and Anglular
