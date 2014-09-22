@@ -21,6 +21,7 @@
   "homepage": "https://github.com/wangxuq/chat",
   "dependencies": {
     "express": "^4.9.0",
+    "mongoose": "^3.8.16",
     "socket.io": "^1.1.0"
   }
 }

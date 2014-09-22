@@ -1,7 +1,22 @@
 //complete the logic of the index.html page
 
 //the module of techNodeApp --- ng-app
-angular.module('techNodeApp',[]);
+angular.module('techNodeApp',[ngRoute]);
+//login logic
+run(function($window,$rootScope,$http,$location){
+	$http({
+		url : '/api/validate',
+		method : 'GET'
+	}).success(function(user){
+		$rootScope.me = user;
+		$location.path('/');
+	}).error(function(data){
+		$location.path('/login')
+	});
+});
+
+
+
 //make the socket.io be a Angular service,then can use this in other wight to communication
 angular.module("techNodeApp").factory('socket',function($rootScope){
 	var socket = io.connect('/');
