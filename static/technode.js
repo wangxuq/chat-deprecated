@@ -5,13 +5,25 @@ angular.module('techNodeApp',[ngRoute]);
 //login logic
 run(function($window,$rootScope,$http,$location){
 	$http({
-		url : '/api/validate',
+		url : '/ajax/validate',
 		method : 'GET'
 	}).success(function(user){
 		$rootScope.me = user;
 		$location.path('/');
 	}).error(function(data){
-		$location.path('/login')
+		$location.path('/login');
+	});
+	$rootScope.logout = function(){
+		$http({
+			url : '/ajax/logout',
+			method : 'GET'
+		}).success(function(){
+			$rootScope.me = null,
+			$location.path('/login');
+		});
+	};
+	$rootScope.$on('login',function(evt,me){
+		$rootScope.me = me;
 	});
 });
 
