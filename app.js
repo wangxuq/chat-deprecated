@@ -29,6 +29,7 @@ app.use(function(req,res){
 });
 
 var io = require('socket.io').listen(app.listen(port));
+//socket request login validate config
 io.set('authorization',function(handshakeData,accept){
 	handshakeData.cookie = Cookie.parse(handshakeData.headers.cookie);
 	var connectSid = handshakeData.cookie['connect.Sid'];
@@ -52,10 +53,40 @@ io.set('authorization',function(handshakeData,accept){
 	}
 });
 
+//socket server
 var messages = [];
 io.sockets.on("connection",function(socket){
-	socket.on('getAllMessages',function(){
-		socket.emit('allMessages',messages);
+	//user online and offline based on socket
+	_userId = socket.handshakeData.session._userId;
+	Controllers.User.online(_userId,function(err,user){
+		if(err){
+			socket.emit('err',{
+				msg : err
+			});
+		}else{
+			socket.broadcast.emit('online',user);
+		}
+	});
+	socket.on('disconnect',function(){
+		Controllers.User.offline(_userId,function(err,user){
+			if(err){
+				socket.emit('err',{
+					msg : err
+				});
+			}else{
+				socket.broadcast.emit('offline',user);
+			}
+		});
+	})
+	
+	socket.on('getRoom',function(){
+		Controllers.user.getOnlineUsers(function(err,users){
+			if(err){
+				socket.emit('err',{msg : err})
+			}else{
+				socket.emit('roomData',{users : users,messages : messages});
+			}
+		});
 	});
 	socket.on('createMessage',function(message){
 		messages.push(message);
@@ -86,7 +117,15 @@ app.post('/api/login',function(req,res){
 				res.json(500,{msg : err});
 			}else{
 				req.session._userId = user._id;
-				res.json(user);
+				Controllers.user.online(user._id,function(err,user){
+					if(err){
+						res.json(500,{
+							msg : err
+						});
+					}else{
+						res.json(user);
+					}
+				});
 			}
 		});
 	}else{
@@ -95,7 +134,16 @@ app.post('/api/login',function(req,res){
 });
 
 app.get('/api/logout',function(req,res){
-	req.session._userId = null;
-	res.json(401);
+	_userId = req.session._userId;
+	Controllers.User.offline(_userId,function(err,user){
+		if(err){
+			res.json(500,{
+				msg : err
+			});
+		}else{
+			res.json(200);
+			delete req.session._userId;
+		}
+	});
 });
 console.log('chat is on port '+port +'!');
