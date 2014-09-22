@@ -1,7 +1,9 @@
 var express = require('express');
+var Controllers = require('./controllers');
+
 var app = express();
 var port = process.env.PORT || 3000;
-var Controllers = require('./controllers')
+
 
 app.use(express.bodyParser());
 app.use(express.cookieParser());
