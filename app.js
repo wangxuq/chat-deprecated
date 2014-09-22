@@ -1,5 +1,5 @@
 var express = require('express');
-var Controllers = require('../controllers');
+var Controllers = require('./controllers');
 
 var app = express();
 var port = process.env.PORT || 3000;
@@ -51,6 +51,7 @@ io.set('authorization',function(handshakeData,accept){
 		accept('No Session');
 	}
 });
+
 var messages = [];
 io.sockets.on("connection",function(socket){
 	socket.on('getAllMessages',function(){
