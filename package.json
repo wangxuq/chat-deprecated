@@ -20,9 +20,10 @@
   },
   "homepage": "https://github.com/wangxuq/chat",
   "dependencies": {
+    "connect": "^3.2.0",
     "connect-mongo": "^0.4.1",
     "cookie": "^0.1.2",
-    "express": "^4.9.0",
+    "express": "^3.5.3",
     "mongoose": "^3.8.16",
     "socket.io": "^1.1.0"
   }

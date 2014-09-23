@@ -1,11 +1,11 @@
 var express = require('express');
-var Controllers = require('./controllers');
+//var Controllers = require('./controllers');
 
 var app = express();
 var port = process.env.PORT || 3000;
 
 //socket request login validate config
-var parseSignedCookie = require('connect').utils.parseSignedCookie;
+//var parseSignedCookie = require('connect').utils.parseSignedCookie;
 var MongoStore = require('connect-mongo')(express);
 var Cookie = require('cookie');
 var sessionStore = new MongoStore({
@@ -57,7 +57,7 @@ io.set('authorization',function(handshakeData,accept){
 var messages = [];
 io.sockets.on("connection",function(socket){
 	//user online and offline based on socket
-	_userId = socket.handshakeData.session._userId;
+	_userId = socket.handshake.session._userId;
 	Controllers.User.online(_userId,function(err,user){
 		if(err){
 			socket.emit('err',{
@@ -65,6 +65,11 @@ io.sockets.on("connection",function(socket){
 			});
 		}else{
 			socket.broadcast.emit('online',user);
+			socket.broadcast.emit('messageAdded',{
+				content : user.name + "enter chatroom",
+				creator : SYSTEM,
+				createAt : new Date()
+			});
 		}
 	});
 	socket.on('disconnect',function(){
@@ -75,22 +80,46 @@ io.sockets.on("connection",function(socket){
 				});
 			}else{
 				socket.broadcast.emit('offline',user);
+				socket.broadcast.emit('messageAdded',{
+					content : user.name + "leave chatroom",
+					creator : SYSTEM,
+					createAt : new Date()
+				});
 			}
 		});
 	})
 	
 	socket.on('getRoom',function(){
-		Controllers.user.getOnlineUsers(function(err,users){
-			if(err){
-				socket.emit('err',{msg : err})
-			}else{
-				socket.emit('roomData',{users : users,messages : messages});
+		async.parallel([
+				function(done){
+					Controllers.user.getOnlineUsers(done);
+				},
+				function(done){
+					Controllers.Messages.read(done);
+				}
+			],
+			function(err,results){
+				if(err){
+					socket.emit('err',{
+						msg : err
+					});
+				}else{
+					socket.emit('roomData',{
+						users : results[0],
+						messages : results[1]
+					});
+				}
 			}
-		});
+		);
 	});
 	socket.on('createMessage',function(message){
-		messages.push(message);
-		io.sockets.emit('messageAdded',message);
+		Controllers.Message.create(function(message){
+			if(err){
+				socket.emit('err',{msg : err});
+			}else{
+				io.sockets.emit('messageAdded',message);
+			}
+		})
 	});
 });
 
