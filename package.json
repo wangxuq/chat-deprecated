@@ -20,10 +20,15 @@
   },
   "homepage": "https://github.com/wangxuq/chat",
   "dependencies": {
+    "angular": "^1.2.23",
+    "angular-moment": "^0.8.2",
+    "angular-route": "^1.2.17-build.163.1",
+    "bootstrap": "^3.2.0",
     "connect": "^3.2.0",
     "connect-mongo": "^0.4.1",
     "cookie": "^0.1.2",
     "express": "^3.5.3",
+    "jquery": "^2.1.1",
     "mongoose": "^3.8.16",
     "socket.io": "^1.1.0"
   }
